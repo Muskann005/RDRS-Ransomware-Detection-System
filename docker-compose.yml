@@ -1,0 +1,27 @@
+
+services:
+  rdrs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: rdrs-app
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONPATH: "/app"
+      RDRS_DB_PATH: "/app/reports/rdrs_recovery_working_20261116.db"
+
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - ./config:/app/config
+
+    restart: unless-stopped
+
+    mem_limit: 1g

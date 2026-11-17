@@ -1,0 +1,329 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDRS | Security Dashboard</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">R</div>
+            <div>
+                <h2>RDRS</h2>
+                <small>Security Center</small>
+            </div>
+        </div>
+
+        <nav>
+            <a href="#overview" class="nav-link active">◈ Overview</a>
+            <a href="#monitoring" class="nav-link">◉ Monitoring</a>
+            <a href="#file-activity" class="nav-link">▤ File Activity</a>
+            <a href="#alerts" class="nav-link">⚠ Alerts</a>
+            <a href="#incidents" class="nav-link">◇ Incidents</a>
+            <a href="#reports" class="nav-link">▧ Reports</a>
+            <a href="#settings" class="nav-link">⚙ Settings</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            RDRS API Connected
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Security Dashboard</h1>
+                <p>Ransomware Detection and Response System</p>
+            </div>
+
+            <div class="topbar-right">
+                <span id="connection-status">Checking API...</span>
+
+                <button class="refresh-btn" onclick="refreshDashboard()">
+                    ↻ Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- OVERVIEW -->
+        <section id="overview">
+
+            <div class="section-heading">
+                <h2>System Overview</h2>
+                <span id="last-updated">Waiting for data...</span>
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <p>Threat Score</p>
+                    <h2 id="threat-score">0</h2>
+                    <span>Out of 100</span>
+                </div>
+
+                <div class="stat-card">
+                    <p>Threat Level</p>
+                    <h2 id="threat-level">Normal</h2>
+                    <span>Current security status</span>
+                </div>
+
+                <div class="stat-card">
+                    <p>Total Events</p>
+                    <h2 id="total-events">0</h2>
+                    <span>Recorded file and scan events</span>
+                </div>
+
+                <div class="stat-card">
+                    <p>Total Alerts</p>
+                    <h2 id="total-alerts">0</h2>
+                    <span>Recorded security alerts</span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SYSTEM MONITORING -->
+        <section id="monitoring">
+
+            <div class="section-heading">
+                <h2>System Monitoring</h2>
+            </div>
+
+            <div class="monitor-grid">
+
+                <div class="panel">
+                    <h3>Process Information</h3>
+
+                    <div class="detail-row">
+                        <span>Latest Process</span>
+                        <strong id="process-name">--</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Process ID</span>
+                        <strong id="process-pid">--</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>CPU Usage</span>
+                        <strong id="cpu-usage">--</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Memory</span>
+                        <strong id="memory-usage">--</strong>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Threat Score History</h3>
+                    <canvas id="threatChart"></canvas>
+                </div>
+
+                <div class="panel">
+                    <h3>Process CPU Usage</h3>
+                    <canvas id="cpuChart"></canvas>
+                </div>
+
+                <!-- NEW ENTROPY CHART -->
+                <div class="panel">
+                    <h3>File Entropy Trend</h3>
+                    <canvas id="entropyChart"></canvas>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FILE ACTIVITY -->
+        <section id="file-activity">
+
+            <div class="section-heading">
+                <h2>Recent File Activity</h2>
+                <span>Latest 15 events</span>
+            </div>
+
+            <div class="panel table-panel">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Event</th>
+                            <th>File</th>
+                            <th>Entropy</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="events-table">
+                        <tr>
+                            <td colspan="5">Loading events...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <!-- NEW TOP MODIFIED FILES -->
+            <div class="section-heading">
+                <h2>Top Modified Files</h2>
+                <span>Based on recorded MODIFIED events</span>
+            </div>
+
+            <div class="panel table-panel">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>File Path</th>
+                            <th>Modification Events</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="top-files-table">
+                        <tr>
+                            <td colspan="2">Loading file statistics...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- ALERTS -->
+        <section id="alerts">
+
+            <div class="section-heading">
+                <h2>Security Alerts</h2>
+            </div>
+
+            <div class="panel table-panel">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Severity</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="alerts-table">
+                        <tr>
+                            <td colspan="4">Loading alerts...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+
+        <!-- INCIDENTS -->
+        <section id="incidents">
+
+            <div class="section-heading">
+                <h2>Security Incidents</h2>
+            </div>
+
+            <div class="panel table-panel">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Severity</th>
+                            <th>Score</th>
+                            <th>Summary</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="incidents-table">
+                        <tr>
+                            <td colspan="5">Loading incidents...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+
+        <!-- REPORTS -->
+        <section id="reports">
+
+            <div class="section-heading">
+                <h2>Reports</h2>
+            </div>
+
+            <div class="panel">
+
+                <p>Download your RDRS security reports.</p>
+
+                <div class="report-buttons">
+
+                    <button onclick="downloadReport()" class="action-btn">
+                        Download JSON Report
+                    </button>
+
+                    <button onclick="downloadCSVReport()" class="action-btn">
+                        Download CSV Report
+                    </button>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settings">
+
+            <div class="section-heading">
+                <h2>System Settings</h2>
+            </div>
+
+            <div class="panel">
+
+                <div class="detail-row">
+                    <span>Simulation Mode</span>
+                    <strong id="simulation-status">See config.yaml</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>CPU Threshold</span>
+                    <strong id="cpu-threshold">See config.yaml</strong>
+                </div>
+
+                <p class="settings-note">
+                    Configuration is managed through config.yaml
+                    and the RDRS settings API.
+                    Simulation mode should remain enabled during
+                    development and testing.
+                </p>
+
+            </div>
+        </section>
+
+        <footer>
+            <p>RDRS - Ransomware Detection and Response System</p>
+            <p>Internship Project | Security Monitoring Dashboard</p>
+        </footer>
+
+    </main>
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
